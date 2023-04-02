@@ -2,6 +2,19 @@ import tkinter as tk
 from tkinter import filedialog,messagebox
 import vlc
 import os
+import platform
+
+# Determine the system type
+system_type = platform.system()
+
+# Configure VLC based on the system type
+if system_type == 'Windows':
+    vlc_options = ['--video-on-top']
+elif system_type == 'Linux':
+    vlc_options = ['--no-xlib']
+
+
+
 
 class VideoPlayer:
     def __init__(self, master,frame):
@@ -47,35 +60,37 @@ class VideoPlayer:
         # Open a file dialog to select a video file
         file_path = filedialog.askopenfilename()
 
-
+        supported_extensions = ['.mp4', '.avi', '.mov', '.wmv']
         # Check if the user cancelled the file dialog
         if not file_path:
             messagebox.showinfo("Error", "No video file selected")
             root.deiconify()
-        else:
-            # Check if file exists
-            if not os.path.isfile(file_path):
-                messagebox.showinfo("Error", "Can't find the video")
-                root.deiconify()
-            else:
-                # Check if the file is a supported video type
-                supported_extensions = ['.mp4', '.avi', '.mov', '.wmv']
-                if os.path.splitext(file_path)[1] not in supported_extensions:
-                    messagebox.showinfo("Error",f"Unsupported video type. Please select a file with one of the following extensions: {', '.join(supported_extensions)}")
-                    root.deiconify()
-                else:   
-                    root.deiconify()
-                    video = vlc.MediaPlayer()
-                    media = vlc.Media(f"{file_path}")
-                    video.set_media(media)
-                    self.video = video
+        # Check if file exists
+        elif not os.path.isfile(file_path):
+            messagebox.showinfo("Error", "Can't find the video")
+            root.deiconify()
+             # Check if the file is a supported video type
+        elif os.path.splitext(file_path)[1] not in supported_extensions:
+            messagebox.showinfo("Error",f"Unsupported video type. Please select a file with one of the following extensions: {', '.join(supported_extensions)}")
+            root.deiconify()
+        else:   
+            root.deiconify()
+            instance = vlc.Instance(vlc_options)
+            video = instance.media_player_new()
+            media = instance.media_new(f"{file_path}")
+            video.set_media(media)
+            self.video = video
 
 
     def play(self):
         if self.video:
-            # self.video.preview(fps=120, fullscreen=False)
-            self.video.set_xwindow(self.frame.winfo_id())
-            self.video.play()
+            match system_type:
+                case 'Linux':
+                    self.video.set_xwindow(self.frame.winfo_id())
+                    self.video.play()
+                case 'Windows':
+                    self.video.set_hwnd(self.frame.winfo_id())
+                    self.video.play()
             
             
 
@@ -118,6 +133,7 @@ class VideoPlayer:
 
 if __name__ == "__main__":
     root = tk.Tk()
+    root.title("RaDa")
     root.geometry('1270x720')
     root.resizable(True, True)
     frame = tk.Frame(root)
