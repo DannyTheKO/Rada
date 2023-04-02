@@ -14,7 +14,7 @@ class VideoPlayer:
 
     def create_controls(self):
         # Create the open file button
-        self.btn_open = tk.Button(self.master, text="Browse", command=self.open_file)
+        self.btn_open = tk.Button(self.master, text="Open File", command=self.open_file)
         self.btn_open.pack(side="left")
 
         # Create the play button
