@@ -60,7 +60,7 @@ class VideoPlayer:
         # Open a file dialog to select a video file
         file_path = filedialog.askopenfilename()
 
-        supported_extensions = ['.mp4', '.avi', '.mov', '.wmv']
+        supported_extensions = ['.mp4', '.avi', '.mov', '.wmv', '.mkv', '.wma', '.wav']
         # Check if the user cancelled the file dialog
         if not file_path:
             messagebox.showinfo("Error", "No video file selected")
